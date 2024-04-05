@@ -4,7 +4,7 @@ from yt_dlp import YoutubeDL
 import ffmpeg
 import os
 
-def download_yt_video(query, audio_format):
+def download_yt_video(query, dl_filepath, audio_format):
     # search for videos matching the query
     videos_search = VideosSearch(query, limit=1)
     result = videos_search.result()
@@ -16,7 +16,8 @@ def download_yt_video(query, audio_format):
 
     # configure parameters
     ydl_opts = {
-        'format': 'bestaudio'
+        'format': 'bestaudio',
+        'outtmpl': f'{dl_filepath}%(title)s.%(ext)s'
     }
 
     # video data
@@ -42,4 +43,4 @@ def download_yt_video(query, audio_format):
 
 if __name__ == "__main__":
     query = input("Enter the title of the YouTube video: ")
-    download_yt_video(query, 'mp3')
+    download_yt_video(query, 'YouTube/', 'mp3')
