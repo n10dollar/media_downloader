@@ -2,7 +2,7 @@ from youtubesearchpython import VideosSearch
 from yt_dlp import YoutubeDL
 import ffmpeg
 
-def download_yt_video(query):
+def download_yt_video(query, audio_format):
     # search for videos matching the query
     videos_search = VideosSearch(query, limit=1)
     result = videos_search.result()
@@ -11,27 +11,31 @@ def download_yt_video(query):
     video_id = result['result'][0]['id']
     video_URL = result['result'][0]['link']
     video_title = result['result'][0]['title']
+    print(video_title)
 
     # configure parameters
     ydl_opts = {
-        # 'format': 'bestaudio'
-        # 'outtmpl': f'{video_title}.mp3',
+        'format': 'bestaudio'
     }
 
-    # download the video
+    # video data
     ydl = YoutubeDL(ydl_opts)
+    video_info = ydl.extract_info(video_URL, download=False)
+    bestaudio_ext = video_info.get('ext')
+
+    downloaded_file_name = ydl.prepare_filename(video_info)
+    processed_file_name = f'{downloaded_file_name.removesuffix(bestaudio_ext)}{audio_format}'
+
+    # download file
     ydl.download([video_URL])
 
-    file_name = video_title
-    file_format = 'mp3'
-
     # convert it to mp3
-    stream = ffmpeg.input(file_name)
-    stream = ffmpeg.output(stream, file_name, format=file_format)
+    stream = ffmpeg.input(downloaded_file_name)
+    stream = ffmpeg.output(stream, processed_file_name, format=audio_format)
     ffmpeg.run(stream, overwrite_output=True)
 
-    print(f"Downloaded {file_name}'")
+    print(f"Downloaded and processed into {processed_file_name}'")
 
 if __name__ == "__main__":
     query = input("Enter the title of the YouTube video: ")
-    download_yt_video(query)
+    download_yt_video(query, 'mp3')
