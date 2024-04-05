@@ -1,5 +1,6 @@
 from youtubesearchpython import VideosSearch
-import youtube_dl
+from yt_dlp import YoutubeDL
+import os
 
 def search_and_download(query):
     # Search for videos matching the query
@@ -12,22 +13,18 @@ def search_and_download(query):
 
     # Get the first video's ID and title
     video_id = result['result'][0]['id']
+    video_URL = result['result'][0]['link']
     video_title = result['result'][0]['title']
 
-    # Download the video and convert it to MP3
     ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': f'{video_title}.mp3',
-        'listformats': True,
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
+        # 'format': 'bestaudio'
+        # 'outtmpl': f'{video_title}.mp3',
     }
 
-    with youtube_dl.YoutubeDL() as ydl:
-        ydl.download([f'https://www.youtube.com/watch?v={video_id}'])
+    # Download the video and convert it to MP3
+    ydl = YoutubeDL(ydl_opts)
+    ydl.download([video_URL])
+    
 
     print(f"Downloaded '{video_title}.mp3'")
 
