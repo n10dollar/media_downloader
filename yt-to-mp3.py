@@ -1,6 +1,8 @@
 from youtubesearchpython import VideosSearch
 from yt_dlp import YoutubeDL
+
 import ffmpeg
+import os
 
 def download_yt_video(query, audio_format):
     # search for videos matching the query
@@ -11,7 +13,6 @@ def download_yt_video(query, audio_format):
     video_id = result['result'][0]['id']
     video_URL = result['result'][0]['link']
     video_title = result['result'][0]['title']
-    print(video_title)
 
     # configure parameters
     ydl_opts = {
@@ -29,10 +30,13 @@ def download_yt_video(query, audio_format):
     # download file
     ydl.download([video_URL])
 
-    # convert it to mp3
+    # convert it to audio_format
     stream = ffmpeg.input(downloaded_file_name)
     stream = ffmpeg.output(stream, processed_file_name, format=audio_format)
     ffmpeg.run(stream, overwrite_output=True)
+
+    # remove original file with bestaudio_ext
+    os.remove(downloaded_file_name)
 
     print(f"Downloaded and processed into {processed_file_name}'")
 
