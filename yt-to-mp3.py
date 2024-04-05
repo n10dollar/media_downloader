@@ -1,6 +1,6 @@
 from youtubesearchpython import VideosSearch
 from yt_dlp import YoutubeDL
-from ffmpeg import stream
+import ffmpeg
 
 def download_yt_video(query):
     # search for videos matching the query
@@ -23,14 +23,14 @@ def download_yt_video(query):
     ydl.download([video_URL])
 
     file_name = video_title
+    file_format = 'mp3'
 
     # convert it to mp3
-    str = stream.Stream()
-    str.input(file_name)
-    str.out()
-    
+    stream = ffmpeg.input(file_name)
+    stream = ffmpeg.output(stream, file_name, format=file_format)
+    ffmpeg.run(stream, overwrite_output=True)
 
-    print(f"Downloaded '{video_title}.mp3'")
+    print(f"Downloaded {file_name}'")
 
 if __name__ == "__main__":
     query = input("Enter the title of the YouTube video: ")
