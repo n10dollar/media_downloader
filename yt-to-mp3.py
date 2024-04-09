@@ -18,12 +18,11 @@ def download_yt_video(query, dl_filepath, limit, audio_format):
     [video_features.append(prune_dict(vid, features)) for vid in videos]
     
     print(json.dumps(video_features, indent=4))
-    exit()
+    choices_str = input('Which videos look the best to you? Enter the index(es) in CSV format (zero-indexed): ')
+    choices = [int(c) for c in choices_str.split(',')]
 
-    # get the first video's ID and title
-    video_id = result['result'][0]['id']
-    video_URL = result['result'][0]['link']
-    video_title = result['result'][0]['title']
+    # get the videos' URLS
+    video_URLs = [result['result'][choice]['link'] for choice in choices]
 
     # configure parameters
     ydl_opts = {
@@ -31,6 +30,11 @@ def download_yt_video(query, dl_filepath, limit, audio_format):
         'outtmpl': f'{dl_filepath}%(title)s.%(ext)s'
     }
 
+    [download_and_process(ydl_opts, video_URL, audio_format) for video_URL in video_URLs]
+
+
+
+def download_and_process(ydl_opts, video_URL, audio_format):
     # video data
     ydl = YoutubeDL(ydl_opts)
     video_info = ydl.extract_info(video_URL, download=False)
@@ -51,6 +55,8 @@ def download_yt_video(query, dl_filepath, limit, audio_format):
     os.remove(downloaded_file_name)
 
     print(f"Downloaded and processed into {processed_file_name}'")
+
+
 
 def prune_dict(ref_dict, features):
     def construct(ref_dict, construct_dict, split):
@@ -81,6 +87,8 @@ def prune_dict(ref_dict, features):
 
 if __name__ == "__main__":
     # query = input("Enter the title of the YouTube video: ")
-    download_yt_video("mouse", 'YouTube/', 2, 'mp3')
+    # limit = input("Enter the number of videos to query: ")
 
-    exit()
+    # download_yt_video(query, 'YouTube/', int(limit), 'mp3')
+    query = "producerx synthwave weeknd-type beat"
+    download_yt_video(query, 'Synthwave/', 15, 'mp3')
