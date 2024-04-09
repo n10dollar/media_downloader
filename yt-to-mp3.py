@@ -4,10 +4,21 @@ from yt_dlp import YoutubeDL
 import ffmpeg
 import os
 
-def download_yt_video(query, dl_filepath, audio_format):
+import json
+
+def download_yt_video(query, dl_filepath, limit, audio_format):
     # search for videos matching the query
-    videos_search = VideosSearch(query, limit=1)
+    videos_search = VideosSearch(query, limit=limit)
     result = videos_search.result()
+    videos = result['result']
+
+    # extract important features
+    video_features = []
+    features = ['title', 'publishedTime', 'duration', 'channel.name', 'channel.id']
+    [video_features.append(prune_dict(vid, features)) for vid in videos]
+    
+    print(json.dumps(video_features, indent=4))
+    exit()
 
     # get the first video's ID and title
     video_id = result['result'][0]['id']
@@ -41,6 +52,35 @@ def download_yt_video(query, dl_filepath, audio_format):
 
     print(f"Downloaded and processed into {processed_file_name}'")
 
+def prune_dict(ref_dict, features):
+    def construct(ref_dict, construct_dict, split):
+        # if [a1, a2, ..., an]
+        curr_key = split[0]
+        rest_keys = split[1:]
+        
+        # check if key exists
+        if curr_key not in ref_dict:
+            raise KeyError(f'{curr_key} doesn\'t exist in ref_dict')
+
+        # base of dict: [a]
+        if len(split) == 1:
+            construct_dict[split[0]] = ref_dict[split[0]]
+            return
+
+        # recurse on sub-dicts
+        if curr_key not in construct_dict:
+            construct_dict[curr_key] = {}    
+        construct(ref_dict[curr_key], construct_dict[curr_key], rest_keys)
+            
+    pruned_dict = {}
+    [construct(ref_dict, pruned_dict, feat.split('.')) for feat in features]
+
+    return pruned_dict
+
+    
+
 if __name__ == "__main__":
-    query = input("Enter the title of the YouTube video: ")
-    download_yt_video(query, 'YouTube/', 'mp3')
+    # query = input("Enter the title of the YouTube video: ")
+    download_yt_video("mouse", 'YouTube/', 2, 'mp3')
+
+    exit()
