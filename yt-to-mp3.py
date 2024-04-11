@@ -18,8 +18,8 @@ def download_yt_video(query, dl_filepath, limit, audio_format):
     [video_features.append(prune_dict(vid, features)) for vid in videos]
     
     print(json.dumps(video_features, indent=4))
-    choices_str = input('Which videos look the best to you? Enter the index(es) in CSV format (zero-indexed): ')
-    choices = [int(c) for c in choices_str.split(',')]
+    choices_str = input('Which videos look the best to you? Enter the index(es) in CSV format (zero-indexed), or say "all": ')
+    choices = [i for i in range(limit)] if choices_str == "all" else [int(c) for c in choices_str.split(',')]
 
     # get the videos' URLS
     video_URLs = [result['result'][choice]['link'] for choice in choices]
@@ -87,8 +87,8 @@ def prune_dict(ref_dict, features):
 
 if __name__ == "__main__":
     # query = input("Enter the title of the YouTube video: ")
-    # limit = input("Enter the number of videos to query: ")
+    limit = input("Enter the number of videos to query: ")
 
     # download_yt_video(query, 'YouTube/', int(limit), 'mp3')
-    query = "producerx synthwave weeknd-type beat"
-    download_yt_video(query, 'Synthwave/', 15, 'mp3')
+    query = "best weeknd-type synthwave beats"
+    download_yt_video(query, 'Synthwave/', int(limit), 'mp3')
