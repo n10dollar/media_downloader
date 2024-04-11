@@ -2,27 +2,26 @@ from youtubesearchpython import VideosSearch
 from yt_dlp import YoutubeDL
 
 import ffmpeg
+import json
 import os
 
-import json
 
-def download_yt_video(query, dl_filepath, limit, audio_format):
+def search_queries(query, features, limit):
     # search for videos matching the query
     videos_search = VideosSearch(query, limit=limit)
-    result = videos_search.result()
-    videos = result['result']
+    dlp_result = videos_search.result()
+    videos = dlp_result['result']
 
     # extract important features
-    video_features = []
-    features = ['title', 'publishedTime', 'duration', 'channel.name', 'channel.id']
-    [video_features.append(prune_dict(vid, features)) for vid in videos]
+    video_features = [prune_dict(vid, features) for vid in videos]
     
-    print(json.dumps(video_features, indent=4))
-    choices_str = input('Which videos look the best to you? Enter the index(es) in CSV format (zero-indexed), or say "all": ')
-    choices = [i for i in range(limit)] if choices_str == "all" else [int(c) for c in choices_str.split(',')]
+    return (dlp_result, video_features)
 
-    # get the videos' URLS
-    video_URLs = [result['result'][choice]['link'] for choice in choices]
+
+
+def download_videos(dlp_result, dl_filepath, choices_str):
+    # parse choices input
+    choices = [i for i in range(limit)] if choices_str == "all" else [int(c) for c in choices_str.split(',')]
 
     # configure parameters
     ydl_opts = {
@@ -30,31 +29,44 @@ def download_yt_video(query, dl_filepath, limit, audio_format):
         'outtmpl': f'{dl_filepath}%(title)s.%(ext)s'
     }
 
-    [download_and_process(ydl_opts, video_URL, audio_format) for video_URL in video_URLs]
-
-
-
-def download_and_process(ydl_opts, video_URL, audio_format):
-    # video data
+    # get the videos' URLS
     ydl = YoutubeDL(ydl_opts)
-    video_info = ydl.extract_info(video_URL, download=False)
-    bestaudio_ext = video_info.get('ext')
+    video_URLs = [dlp_result['result'][choice]['link'] for choice in choices]
 
-    downloaded_file_name = ydl.prepare_filename(video_info)
-    processed_file_name = f'{downloaded_file_name.removesuffix(bestaudio_ext)}{audio_format}'
+    # video identifiers
+    dl_files = []
 
-    # download file
-    ydl.download([video_URL])
+    # download videos
+    for video_URL in video_URLs:
+        # video data
+        video_info = ydl.extract_info(video_URL, download=False)
 
-    # convert it to audio_format
-    stream = ffmpeg.input(downloaded_file_name)
-    stream = ffmpeg.output(stream, processed_file_name, format=audio_format)
-    ffmpeg.run(stream, overwrite_output=True)
+        downloaded_file_name = ydl.prepare_filename(video_info)
+        dl_files.append(downloaded_file_name)
 
-    # remove original file with bestaudio_ext
-    os.remove(downloaded_file_name)
+        # download file
+        ydl.download([video_URL])
+    
+    return dl_files
 
-    print(f"Downloaded and processed into {processed_file_name}'")
+
+
+def convert_videos(conv_files, audio_format):
+    for conv_file in conv_files:
+        # process output file name
+        name_and_ext = conv_file.split('.')
+        output_file = f'{name_and_ext[0]}.{audio_format}'
+
+        if not os.path.exists(output_file):
+            # convert file to audio_format
+            stream = ffmpeg.input(conv_file)
+            stream = ffmpeg.output(stream, output_file, format=audio_format)
+            ffmpeg.run(stream)
+
+        # remove original file with bestaudio_ext
+        os.remove(conv_file)
+
+    print(f"Downloaded and processed into {conv_file}'")
 
 
 
@@ -86,9 +98,16 @@ def prune_dict(ref_dict, features):
     
 
 if __name__ == "__main__":
-    # query = input("Enter the title of the YouTube video: ")
     limit = input("Enter the number of videos to query: ")
 
-    # download_yt_video(query, 'YouTube/', int(limit), 'mp3')
-    query = "best weeknd-type synthwave beats"
-    download_yt_video(query, 'Synthwave/', int(limit), 'mp3')
+    query = "best travis scott type beat"
+    features = ['title', 'publishedTime', 'duration', 'channel.name', 'channel.id']
+    
+    (dlp_result, video_features) = search_queries(query, features, int(limit))
+
+    print(json.dumps(video_features, indent=4))
+    choices_str = input('Which videos look the best to you? Enter the index(es) as CSV: ')
+
+    dl_files = download_videos(dlp_result, 'Synthwave/', choices_str)
+    print(dl_files)
+    convert_videos(dl_files, 'mp3')
