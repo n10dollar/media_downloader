@@ -2,6 +2,7 @@ from youtubesearchpython import VideosSearch
 from yt_dlp import YoutubeDL
 
 import ffmpeg
+import threading
 import json
 import os
 
@@ -19,52 +20,56 @@ def search_queries(query, features, limit):
 
 
 
-def download_videos(dlp_result, dl_filepath, choices_str):
-    # parse choices input
-    choices = [i for i in range(limit)] if choices_str == "all" else [int(c) for c in choices_str.split(',')]
+def download_and_convert_videos(video_URLs, dl_filepath, audio_format):
+    def download_and_convert_video(video_URL, dl_filepath, audio_format):
+        dl_file = download_video(video_URL, dl_filepath)
+        convert_video(dl_file, audio_format)
 
+    threads = []
+    for video_URL in video_URLs:
+        thread = threading.Thread(target=download_and_convert_video, args=(video_URL, dl_filepath, audio_format))
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+       
+
+def download_video(video_URL, dl_filepath):
     # configure parameters
     ydl_opts = {
         'format': 'bestaudio',
         'outtmpl': f'{dl_filepath}%(title)s.%(ext)s'
     }
-
-    # get the videos' URLS
     ydl = YoutubeDL(ydl_opts)
-    video_URLs = [dlp_result['result'][choice]['link'] for choice in choices]
 
-    # video identifiers
-    dl_files = []
+    # video data
+    video_info = ydl.extract_info(video_URL, download=False)
 
-    # download videos
-    for video_URL in video_URLs:
-        # video data
-        video_info = ydl.extract_info(video_URL, download=False)
+    # downloaded file name
+    dl_file = ydl.prepare_filename(video_info)
 
-        downloaded_file_name = ydl.prepare_filename(video_info)
-        dl_files.append(downloaded_file_name)
-
-        # download file
-        ydl.download([video_URL])
+    # download file
+    ydl.download([video_URL])
     
-    return dl_files
+    return dl_file
 
 
 
-def convert_videos(conv_files, audio_format):
-    for conv_file in conv_files:
-        # process output file name
-        name_and_ext = conv_file.split('.')
-        output_file = f'{name_and_ext[0]}.{audio_format}'
+def convert_video(conv_file, audio_format):
+    # process output file name
+    name_and_ext = conv_file.split('.')
+    output_file = f'{name_and_ext[0]}.{audio_format}'
 
-        if not os.path.exists(output_file):
-            # convert file to audio_format
-            stream = ffmpeg.input(conv_file)
-            stream = ffmpeg.output(stream, output_file, format=audio_format)
-            ffmpeg.run(stream)
+    if not os.path.exists(output_file):
+        # convert file to audio_format
+        stream = ffmpeg.input(conv_file)
+        stream = ffmpeg.output(stream, output_file, format=audio_format)
+        ffmpeg.run(stream)
 
-        # remove original file with bestaudio_ext
-        os.remove(conv_file)
+    # remove original file with bestaudio_ext
+    os.remove(conv_file)
 
     print(f"Downloaded and processed into {conv_file}'")
 
@@ -98,16 +103,19 @@ def prune_dict(ref_dict, features):
     
 
 if __name__ == "__main__":
-    limit = input("Enter the number of videos to query: ")
+    # limit = input("Enter the number of videos to query: ")
+    limit = 8
+    limit_int = int(limit)
 
-    query = "best travis scott type beat"
+    query = "travis scott type beat"
     features = ['title', 'publishedTime', 'duration', 'channel.name', 'channel.id']
     
-    (dlp_result, video_features) = search_queries(query, features, int(limit))
+    (dlp_result, video_features) = search_queries(query, features, limit_int)
 
     print(json.dumps(video_features, indent=4))
     choices_str = input('Which videos look the best to you? Enter the index(es) as CSV: ')
 
-    dl_files = download_videos(dlp_result, 'Synthwave/', choices_str)
-    print(dl_files)
-    convert_videos(dl_files, 'mp3')
+    choices = [i for i in range(limit_int)] if choices_str == "all" else [int(c) for c in choices_str.split(',')]
+    video_URLs = [dlp_result['result'][choice]['link'] for choice in choices]
+
+    download_and_convert_videos(video_URLs, 'Travis/', 'mp3')
