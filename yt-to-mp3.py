@@ -1,6 +1,8 @@
 from youtubesearchpython import VideosSearch
 from yt_dlp import YoutubeDL
 
+import PySimpleGUI as sg
+
 import ffmpeg
 import threading
 import json
@@ -102,7 +104,15 @@ def prune_dict(ref_dict, features):
 
     
 
-if __name__ == "__main__":
+def extract_URLs(dlp_result, limit, choices_str):
+    choices = [i for i in range(limit)] if choices_str == "all" else [int(c) for c in choices_str.split(',')]
+    video_URLs = [dlp_result['result'][choice]['link'] for choice in choices]
+
+    return video_URLs
+
+
+
+def terminal_deploy():
     # limit = input("Enter the number of videos to query: ")
     limit = 8
     limit_int = int(limit)
@@ -119,3 +129,49 @@ if __name__ == "__main__":
     video_URLs = [dlp_result['result'][choice]['link'] for choice in choices]
 
     download_and_convert_videos(video_URLs, 'Travis/', 'mp3')
+
+
+
+def gui_deploy():
+    # All the stuff inside your window.
+    layout = [[sg.Text("Search YouTube!")],
+              [sg.InputText()],
+              [sg.Text("Result count:")],
+              [sg.InputText()],
+              [sg.Text("Choices (CSV):")],
+              [sg.InputText()],
+              [sg.Button('Search'), sg.Button('Download'), sg.Button('Cancel')]]
+
+    # Create the Window
+    window = sg.Window('Hello Example', layout)
+
+    # local variables
+    dlp_result, video_features, video_URLs = [0, 0, 0]
+    features = ['title', 'publishedTime', 'duration', 'channel.name', 'channel.id']
+
+    # Event Loop to process "events" and get the "values" of the inputs
+    while True:
+        event, values = window.read()
+        query, limit, choices_str = values.values()
+        format, filepath = 'mp3', 'Lil_Uzi/'
+
+        print(query)
+
+        # if user closes window or clicks cancel
+        if event == sg.WIN_CLOSED or event == 'Cancel':
+            break
+        elif event == 'Search':
+            dlp_result, video_features = search_queries(query, features, int(limit))
+            print(json.dumps(video_features, indent=4))
+        elif event == 'Download':
+            video_URLs = extract_URLs(dlp_result, int(limit), choices_str)
+            download_and_convert_videos(video_URLs, filepath, format)
+
+    window.close()
+
+
+
+if __name__ == "__main__":
+    # terminal_deploy()
+    gui_deploy()
+
