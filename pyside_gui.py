@@ -1,6 +1,6 @@
 import sys
 import json
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import *
 
 import yt_to_mp3 as ytm
 
@@ -9,12 +9,9 @@ class YTWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        # variables
-        # placeholder
-
         self.setWindowTitle("Basic PySide6 GUI")
         self.setGeometry(100, 100, 300, 200)
-
+        
         # Create widgets
         self.query = QLabel("Enter search query:")
         self.query_res = QLineEdit()
@@ -43,10 +40,9 @@ class YTWidget(QWidget):
         features = ['title', 'publishedTime', 'duration', 'channel.name', 'channel.id']
         dlp_result, video_features = ytm.search_queries(query, features, int(count))
         vid_feat_str = json.dumps(video_features, indent=4)
-        # self.video_features_text = video_features
 
         self.video_features.setText(vid_feat_str)
-        print(vid_feat_str)
+
 
 
 def pyside6_gui_deploy():

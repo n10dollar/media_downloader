@@ -16,7 +16,7 @@ def search_queries(query, features, limit):
     # extract important features
     video_features = [yth.prune_dict(vid, features) for vid in videos]
     
-    return (dlp_result, video_features)
+    return dlp_result, video_features
 
 
 
@@ -38,17 +38,15 @@ def download_and_convert_videos(video_URLs, dl_filepath, audio_format):
 def terminal_deploy():
     # limit = input("Enter the number of videos to query: ")
     limit = 8
-    limit_int = int(limit)
-
     query = "travis scott type beat"
     features = ['title', 'publishedTime', 'duration', 'channel.name', 'channel.id']
     
-    (dlp_result, video_features) = yth.search_queries(query, features, limit_int)
+    dlp_result, video_features = yth.search_queries(query, features, int(limit))
 
-    print(json.dumps(video_features, indent=4))
+    # print(json.dumps(video_features, indent=4))
     choices_str = input('Which videos look the best to you? Enter the index(es) as CSV: ')
 
-    choices = [i for i in range(limit_int)] if choices_str == "all" else [int(c) for c in choices_str.split(',')]
+    choices = [i for i in range(int(limit))] if choices_str == "all" else [int(c) for c in choices_str.split(',')]
     video_URLs = [dlp_result['result'][choice]['link'] for choice in choices]
 
     yth.download_and_convert_videos(video_URLs, 'Travis/', 'mp3')
