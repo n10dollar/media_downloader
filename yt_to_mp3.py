@@ -1,9 +1,10 @@
 from youtubesearchpython import VideosSearch
+
 import threading
 import json
 
 import yt_helpers as yth
-
+import pyside_gui as psg
 
 
 def search_queries(query, features, limit):
@@ -34,7 +35,6 @@ def download_and_convert_videos(video_URLs, dl_filepath, audio_format):
         thread.join()
 
 
-
 def terminal_deploy():
     # limit = input("Enter the number of videos to query: ")
     limit = 8
@@ -43,7 +43,7 @@ def terminal_deploy():
     query = "travis scott type beat"
     features = ['title', 'publishedTime', 'duration', 'channel.name', 'channel.id']
     
-    (dlp_result, video_features) = search_queries(query, features, limit_int)
+    (dlp_result, video_features) = yth.search_queries(query, features, limit_int)
 
     print(json.dumps(video_features, indent=4))
     choices_str = input('Which videos look the best to you? Enter the index(es) as CSV: ')
@@ -51,16 +51,11 @@ def terminal_deploy():
     choices = [i for i in range(limit_int)] if choices_str == "all" else [int(c) for c in choices_str.split(',')]
     video_URLs = [dlp_result['result'][choice]['link'] for choice in choices]
 
-    download_and_convert_videos(video_URLs, 'Travis/', 'mp3')
-
-
-
-def pyside6_gui_deploy():
-    pass
+    yth.download_and_convert_videos(video_URLs, 'Travis/', 'mp3')
 
 
 
 if __name__ == "__main__":
     # terminal_deploy()
-    pyside6_gui_deploy()
+    psg.pyside6_gui_deploy()
 
