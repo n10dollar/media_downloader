@@ -26,21 +26,22 @@ def download_video(video_URL, dl_filepath):
 
 
 
-def convert_video(conv_file, audio_format):
+def convert_video(dl_file, audio_format):
     # process output file name
-    name_and_ext = conv_file.split('.')
-    output_file = f'{name_and_ext[0]}.{audio_format}'
+    name_and_ext = dl_file.split('.')
+    conv_file = f'{name_and_ext[0]}.{audio_format}'
 
-    if not os.path.exists(output_file):
+    if not os.path.exists(conv_file):
         # convert file to audio_format
-        stream = ffmpeg.input(conv_file)
-        stream = ffmpeg.output(stream, output_file, format=audio_format)
+        stream = ffmpeg.input(dl_file)
+        stream = ffmpeg.output(stream, conv_file, format=audio_format)
         ffmpeg.run(stream)
 
     # remove original file with bestaudio_ext
-    os.remove(conv_file)
+    os.remove(dl_file)
 
-    print(f"Downloaded and processed into {conv_file}'")
+    print(f"Downloaded and processed {dl_file} into {conv_file}'")
+    return conv_file
 
 
 

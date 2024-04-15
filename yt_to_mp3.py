@@ -21,9 +21,11 @@ def search_queries(query, features, limit):
 
 
 def download_and_convert_videos(video_URLs, dl_filepath, audio_format):
+    conv_files = []
     def download_and_convert_video(video_URL, dl_filepath, audio_format):
         dl_file = yth.download_video(video_URL, dl_filepath)
-        yth.convert_video(dl_file, audio_format)
+        conv_file = yth.convert_video(dl_file, audio_format)
+        conv_files.append(conv_file)
 
     threads = []
     for video_URL in video_URLs:
@@ -33,6 +35,9 @@ def download_and_convert_videos(video_URLs, dl_filepath, audio_format):
 
     for thread in threads:
         thread.join()
+    
+    return conv_files
+
 
 
 def terminal_deploy():
