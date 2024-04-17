@@ -37,8 +37,8 @@ def convert_video(dl_file, audio_format):
         stream = ffmpeg.output(stream, conv_file, format=audio_format)
         ffmpeg.run(stream)
 
-    # remove original file with bestaudio_ext
-    os.remove(dl_file)
+        # remove original file with bestaudio_ext
+        os.remove(dl_file)
 
     print(f"Downloaded and processed {dl_file} into {conv_file}'")
     return conv_file
@@ -72,9 +72,9 @@ def prune_dict(ref_dict, features):
 
     
 
-def extract_URLs(dlp_result, limit, choices_str):
+def extract_URLs(search_res, limit, choices_str):
     choices = [i for i in range(limit)] if choices_str == "all" else [int(c) for c in choices_str.split(',')]
-    video_URLs = [dlp_result['result'][choice]['link'] for choice in choices]
+    video_URLs = [search_res['result'][choice]['link'] for choice in choices]
 
     return video_URLs
 

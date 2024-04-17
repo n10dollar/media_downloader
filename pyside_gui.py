@@ -20,7 +20,7 @@ class YTWidget(QWidget):
         self.query_val = QUERY
         self.limit_val = LIMIT
         self.fields_val = FIELDS
-        self.dlp_result_val = None
+        self.search_res_val = None
         self.video_features_val = None
         self.dl_filepath_val = DL_FILEPATH
         self.choices_str_val = CHOICES_STR
@@ -77,8 +77,8 @@ class YTWidget(QWidget):
         self.limit_val = self.limit_res.text() or LIMIT
         self.fields_val = self.fields_res.text() or FIELDS
 
-        dlp_result, video_features = ytm.search_queries(self.query_val, self.fields_val, int(self.limit_val))
-        self.dlp_result_val = dlp_result
+        search_res, video_features = ytm.search_youtube(self.query_val, self.fields_val, int(self.limit_val))
+        self.search_res_val = search_res
         self.video_features_val = video_features
 
         vid_feat_str = json.dumps(video_features, indent=4)
@@ -90,7 +90,7 @@ class YTWidget(QWidget):
         self.choices_str_val = self.choices_res.text() or CHOICES_STR
         self.audio_format_val = self.audio_format_res.text() or AUDIO_FORMAT
 
-        video_URLs = yth.extract_URLs(self.dlp_result_val, self.limit, self.choices_str_val)
+        video_URLs = yth.extract_URLs(self.search_res_val, self.limit, self.choices_str_val)
         conv_files = ytm.download_and_convert_videos(video_URLs, self.dl_filepath_val, self.audio_format_val)
         self.dl_files = conv_files
 
