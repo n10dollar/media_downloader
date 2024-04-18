@@ -16,7 +16,7 @@ def search_soundcloud(query, features, limit):
     songs = [next(search_res) for _ in range(limit)]
     
     # extract important features
-    song_features = [{feat: getattr(song, feat) for feat in features} for song in songs]
+    song_features = [{feat: getattr(song, feat) for feat in features if hasattr(song, feat)} for song in songs]
     return songs, song_features
 
 
@@ -36,10 +36,7 @@ def search_youtube(query, features, limit):
 def download_and_convert_videos(video_URLs, dl_filepath, audio_format):
     conv_files = []
     def download_and_convert_video(video_URL, dl_filepath, audio_format):
-        #if source == "YouTube" or "YT":
         dl_file = yth.download_video(video_URL, dl_filepath)
-        # elif source == "SoundCloud" or "SC":
-        #     dl_file = 'a'
         conv_file = yth.convert_video(dl_file, audio_format)
         conv_files.append(conv_file)
 
@@ -76,9 +73,9 @@ def terminal_deploy():
 
 if __name__ == "__main__":
     # terminal_deploy()
-    # psg.pyside6_gui_deploy()
-    query = "the parrot has no head"
-    features = ['title', 'sharing']
-    songs, song_features = search_soundcloud(query, features, 3)
-    download_and_convert_videos([songs[0].permalink_url], 'weeknd_songs/', 'mp3')
-    print(song_features)
+    psg.pyside6_gui_deploy()
+    # query = "the parrot has no head"
+    # features = ['title', 'sharing']
+    # songs, song_features = search_soundcloud(query, features, 3)
+    # download_and_convert_videos([songs[0].permalink_url], 'weeknd_songs/', 'mp3')
+    # print(song_features)
