@@ -26,7 +26,7 @@ class YTWidget(QWidget):
         self.dl_files = None
 
         self.setWindowTitle('yt_to_mp3')
-        self.setGeometry(100, 100, 800, 200)
+        self.setGeometry(X, Y, WIDTH, HEIGHT)
 
         # Create widgets
         self.query_tx = QLabel('Query:')
@@ -47,7 +47,12 @@ class YTWidget(QWidget):
         self.audio_format_res = QLineEdit()
         self.download_but = QPushButton('Download')
 
+        self.feature_data_tx_scroll = QScrollArea()
         self.feature_data_tx = QLabel('')
+
+        self.feature_data_tx_scroll.setWidgetResizable(True)
+        self.feature_data_tx_scroll.setFixedHeight(HEIGHT / 2)
+        self.feature_data_tx_scroll.setWidget(self.feature_data_tx)
 
         self.widgets = [self.query_tx, self.query_res,
                         self.limit_tx, self.limit_res,
@@ -58,7 +63,7 @@ class YTWidget(QWidget):
                         self.filepath_tx, self.filepath_res,
                         self.audio_format_tx, self.audio_format_res,
                         self.download_but,
-                        self.feature_data_tx]
+                        self.feature_data_tx_scroll]
 
         # Connect button click event to a function
         self.search_but.clicked.connect(self.on_search)

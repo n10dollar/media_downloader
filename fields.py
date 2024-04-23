@@ -1,5 +1,10 @@
 import yt_to_mp3 as ytm
 
+X = 100
+Y = 100
+WIDTH = 800
+HEIGHT = 400
+
 QUERY = "the weeknd - after hours"
 LIMIT = 3
 FEATURES = ["title", "duration", "channel.name"]
