@@ -6,7 +6,8 @@ def prune_dict(ref_dict, features):
 
         # check if key exists
         if curr_key not in ref_dict:
-            raise KeyError(f'{curr_key} doesn\'t exist in ref_dict')
+            print(f'{curr_key} doesn\'t exist in ref_dict')
+            return
 
         # base of dict: [a]
         if len(split) == 1:
@@ -24,10 +25,11 @@ def prune_dict(ref_dict, features):
     return pruned_dict
 
 
+def get_urls(engine, media, choices):
+    mappings = {
+        "yt": lambda choice: media[choice]['link'],
+        "sc": lambda choice: getattr(media[choice], 'permalink_url')
+    }
 
-
-
-def extract_YT_URLs(media, choices_str, limit):
-    choices = [i for i in range(limit)] if choices_str == "all" else [int(c) for c in choices_str.split(',')]
-    video_URLs = [media[choice]['link'] for choice in choices]
-    return video_URLs
+    urls = [mappings[engine](choice) for choice in choices]
+    return urls

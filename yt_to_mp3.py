@@ -11,4 +11,4 @@ def terminal_deploy():
 
 if __name__ == '__main__':
     # terminal_deploy()
-    psg.pyside6_gui_deploy()
+    psg.pyside_gui_deploy()

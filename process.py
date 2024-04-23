@@ -1,3 +1,4 @@
+import soundcloud
 from youtubesearchpython import VideosSearch
 from soundcloud import SoundCloud
 from yt_dlp import YoutubeDL
@@ -10,7 +11,7 @@ import utils
 
 
 # engine: ["YT", "SC"]
-def search(engine, query, features_extract, limit):
+def search(engine, query, limit):
     def search_youtube(query, limit):
         # search for videos matching the query
         videos_search = VideosSearch(query, limit=limit)
@@ -25,34 +26,31 @@ def search(engine, query, features_extract, limit):
         songs = [next(search_res) for _ in range(limit)]
         return songs
 
-    def features(media, features_extract):
-        # extract specific features from fields dict
-        media_features = [utils.prune_dict(medium, features_extract) for medium in media]
-        return media_features
-
     mappings = {
-        "yt": {
-            "search": search_youtube,
-            "features": features
-        },
-        "sc": {
-            "search": search_soundcloud,
-            "features": features
-        }
+        "yt": search_youtube,
+        "sc": search_soundcloud
     }
 
-    media = mappings[engine]["search"](query, limit)
-    print(media)
-    features = mappings[engine]["features"](media, features_extract)
-    return media, features
+    media = mappings[engine](query, limit)
+    return media
 
 
-def download(video_url, ydl_opts):
+def get_features(engine, media, features):
+    mappings = {
+        "yt": lambda medium, features: utils.prune_dict(medium, features),
+        "sc": lambda medium, features: {feat: getattr(medium, feat) for feat in features if hasattr(medium, feat)}
+    }
+
+    features = [mappings[engine](medium, features) for medium in media]
+    return features
+
+
+def download(url, ydl_opts):
     ydl = YoutubeDL(ydl_opts)
-    video_info = ydl.extract_info(video_url, download=False)
+    video_info = ydl.extract_info(url, download=False)
     dl_file = ydl.prepare_filename(video_info)
 
-    ydl.download([video_url])
+    ydl.download([url])
     return dl_file
 
 
