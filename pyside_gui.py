@@ -16,15 +16,14 @@ class YTWidget(QWidget):
         self.fields_val = FIELDS
         self.engine_val = ENGINE
         self.media_val = None
-        self.video_features_val = None
+        self.features_val = None
         self.dl_filepath_val = DL_FILEPATH
         self.choices_str_val = CHOICES_STR
         self.audio_format_val = AUDIO_FORMAT
 
         # data variables
         self.media = None
-        self.video_features = None
-
+        self.features = None
         self.dl_files = None
 
         self.setWindowTitle('yt_to_mp3')
@@ -49,18 +48,18 @@ class YTWidget(QWidget):
         self.audio_format_res = QLineEdit()
         self.download_but = QPushButton('Download')
 
-        self.video_features_tx = QLabel('')
+        self.features_tx = QLabel('')
 
         self.widgets = [self.query_tx, self.query_res,
                         self.limit_tx, self.limit_res,
                         self.fields_tx, self.fields_res,
-                        self.engine_tx,
+                        self.engine_tx, self.engine_res,
                         self.search_but,
                         self.choices_tx, self.choices_res,
                         self.filepath_tx, self.filepath_res,
                         self.audio_format_tx, self.audio_format_res,
                         self.download_but,
-                        self.video_features_tx]
+                        self.features_tx]
 
         # Connect button click event to a function
         self.search_but.clicked.connect(self.on_search)
@@ -79,13 +78,13 @@ class YTWidget(QWidget):
         self.fields_val = self.fields_res.text() or FIELDS
         self.engine_val = self.engine_res.text() or ENGINE
 
-        media, video_features = prc.search(self.engine_val, self.query_val, int(self.limit_val))
+        media, features = prc.search(self.engine_val, self.query_val, self.fields_val, int(self.limit_val))
 
         self.media = media
-        self.video_features = video_features
+        self.features = features
 
-        self.video_features_val = video_features
-        self.video_features.setText(self.video_features_val)
+        self.features_val = json.dumps(features, indent=4)
+        self.features_tx.setText(self.features_val)
 
     def on_download(self):
         self.dl_filepath_val = self.filepath_res.text() or DL_FILEPATH
@@ -95,7 +94,10 @@ class YTWidget(QWidget):
         choices = [int(c) for c in self.choices_str_val.split(',')]
         urls = [self.media[choice]['link'] for choice in choices]
 
-        conv_files = prc.download_and_convert_multithread(urls, YDL_OPTS, self.audio_format_val)
+        ydl_opts = YDL_OPTS
+        ydl_opts['outtmpl'] = f'{self.dl_filepath_val}%(title)s.%(ext)s'
+
+        conv_files = prc.download_and_convert_multithread(urls, ydl_opts, self.audio_format_val)
         self.dl_files = conv_files
 
 

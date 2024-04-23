@@ -10,7 +10,7 @@ import utils
 
 
 # engine: ["YT", "SC"]
-def search(engine, query, limit):
+def search(engine, query, features_extract, limit):
     def search_youtube(query, limit):
         # search for videos matching the query
         videos_search = VideosSearch(query, limit=limit)
@@ -42,7 +42,8 @@ def search(engine, query, limit):
     }
 
     media = mappings[engine]["search"](query, limit)
-    features = mappings[engine]["features"](media)
+    print(media)
+    features = mappings[engine]["features"](media, features_extract)
     return media, features
 
 
