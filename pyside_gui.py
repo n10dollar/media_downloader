@@ -4,14 +4,7 @@ from PySide6.QtWidgets import *
 
 import yt_to_mp3 as ytm
 import yt_helpers as yth
-
-QUERY = 'travis type beat'
-LIMIT = 3
-FIELDS = ['title', 'duration', 'channel.name']
-ENGINE = 'YouTube'
-DL_FILEPATH = '/Users/neiltendolkar10/Music/Script_DL/'
-CHOICES_STR = '0'
-AUDIO_FORMAT = 'mp3'
+from defaults import *
 
 class YTWidget(QWidget):
     def __init__(self):
@@ -32,7 +25,7 @@ class YTWidget(QWidget):
 
         self.setWindowTitle('Basic PySide6 GUI')
         self.setGeometry(100, 100, 800, 200)
-        
+
         # Create widgets
         self.query = QLabel('Query:')
         self.query_res = QLineEdit()
@@ -55,11 +48,11 @@ class YTWidget(QWidget):
 
         self.engine.addItems(['Default', 'Youtube', 'SoundCloud', 'All'])
 
-        self.widgets = [self.query, self.query_res, 
+        self.widgets = [self.query, self.query_res,
                         self.limit, self.limit_res,
-                        self.fields, self.fields_res, 
+                        self.fields, self.fields_res,
                         self.engine,
-                        self.search_but, 
+                        self.search_but,
                         self.choices, self.choices_res,
                         self.filepath, self.filepath_res,
                         self.audio_format, self.audio_format_res,
@@ -76,7 +69,6 @@ class YTWidget(QWidget):
 
         # Set the layout for the widget
         self.setLayout(layout)
-
 
     def on_search(self):
         self.query_val = self.query_res.text() or QUERY
@@ -102,20 +94,18 @@ class YTWidget(QWidget):
 
             vid_feat_str = json.dumps(video_features, indent=4)
             all_video_features = f'{all_video_features}\n{vid_feat_str}'
-            
+
         self.video_features_val = all_video_features
         self.video_features.setText(self.video_features_val)
-
 
     def on_download(self):
         self.dl_filepath_val = self.filepath_res.text() or DL_FILEPATH
         self.choices_str_val = self.choices_res.text() or CHOICES_STR
         self.audio_format_val = self.audio_format_res.text() or AUDIO_FORMAT
 
-        video_URLs = yth.extract_URLs(self.search_res_val, self.limit, self.choices_str_val)
+        video_URLs = yth.extract_YT_URLs(self.search_res_val, self.limit, self.choices_str_val)
         conv_files = ytm.download_and_convert_videos(video_URLs, self.dl_filepath_val, self.audio_format_val)
         self.dl_files = conv_files
-
 
 
 def pyside6_gui_deploy():
