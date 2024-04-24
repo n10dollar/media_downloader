@@ -56,7 +56,8 @@ def download(url, ydl_opts):
 
 def convert(dl_file, audio_format):
     # process output file name
-    name, ext = dl_file.split('.')
+    segments = dl_file.split('.')
+    name, ext = '.'.join(segments[:-1]), segments[-1]
     conv_file = f'{name}.{audio_format}'
 
     if not os.path.exists(conv_file):
