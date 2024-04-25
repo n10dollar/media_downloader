@@ -6,7 +6,7 @@ def prune_dict(ref_dict, features):
 
         # check if key exists
         if curr_key not in ref_dict:
-            print(f'{curr_key} doesn\'t exist in ref_dict')
+            print(f"{curr_key} doesn't exist in ref_dict")
             return
 
         # base of dict: [a]

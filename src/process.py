@@ -1,4 +1,3 @@
-import soundcloud
 from youtubesearchpython import VideosSearch
 from soundcloud import SoundCloud
 from yt_dlp import YoutubeDL
@@ -10,7 +9,6 @@ import os
 import utils
 
 
-# engine: ["YT", "SC"]
 def search(engine, query, limit):
     def search_youtube(query, limit):
         # search for videos matching the query

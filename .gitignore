@@ -3,6 +3,5 @@
 *.m4a
 *.webm
 
-*/*
-
 .DS_Store
+.idea
