@@ -1,0 +1,9 @@
+ffmpeg-python
+PySide6
+soundcloud-v2
+youtube-search-python
+yt-dlp
+pyinstaller
+
+[dev]
+pyinstaller

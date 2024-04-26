@@ -1,0 +1,11 @@
+pyproject.toml
+src/fields.py
+src/process.py
+src/pyside_gui.py
+src/utils.py
+src/yt_to_mp3.py
+src/media_downloader.egg-info/PKG-INFO
+src/media_downloader.egg-info/SOURCES.txt
+src/media_downloader.egg-info/dependency_links.txt
+src/media_downloader.egg-info/requires.txt
+src/media_downloader.egg-info/top_level.txt

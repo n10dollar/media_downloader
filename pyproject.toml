@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "media_downloader"
+version = "0.1"
+dependencies = [
+  "ffmpeg-python",
+  "PySide6",
+  "soundcloud-v2",
+  "youtube-search-python",
+  "yt-dlp",
+  "pyinstaller"
+]
+authors = [
+  {name = "Neil Tendolkar", email = "ntendolkar@berkeley.edu"}
+]
+maintainers = [
+  {name = "Neil Tendolkar", email = "ntendolkar@berkeley.edu"}
+]
+description = "Convert media URLS to audio files!"
+
+
+[project.optional-dependencies]
+dev = [
+  "pyinstaller"
+]
