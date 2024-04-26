@@ -4,11 +4,12 @@ Version: 0.1
 Summary: Convert media URLS to audio files!
 Author-email: Neil Tendolkar <ntendolkar@berkeley.edu>
 Maintainer-email: Neil Tendolkar <ntendolkar@berkeley.edu>
+Requires-Python: >=3.10
 Requires-Dist: ffmpeg-python
 Requires-Dist: PySide6
 Requires-Dist: soundcloud-v2
 Requires-Dist: youtube-search-python
 Requires-Dist: yt-dlp
 Requires-Dist: pyinstaller
-Provides-Extra: dev
-Requires-Dist: pyinstaller; extra == "dev"
+Provides-Extra: build
+Requires-Dist: pyinstaller; extra == "build"

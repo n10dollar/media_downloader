@@ -1,5 +1,3 @@
-import yt_to_mp3 as ytm
-
 X = 100
 Y = 100
 WIDTH = 800

@@ -5,5 +5,5 @@ youtube-search-python
 yt-dlp
 pyinstaller
 
-[dev]
+[build]
 pyinstaller
