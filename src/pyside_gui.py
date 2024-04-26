@@ -41,7 +41,7 @@ class YTWidget(QWidget):
         self.search_but = QPushButton('Search')
 
         self.choices_tx = QLabel('Choices:')
-        self.choices_res = QLineEdit()
+        self.choices_res = QLineEdit(QUERY)
         self.filepath_tx = QLabel('File Path:')
         self.filepath_res = QLineEdit()
         self.audio_format_tx = QLabel('Format:')
@@ -54,6 +54,16 @@ class YTWidget(QWidget):
         self.feature_data_tx_scroll.setWidgetResizable(True)
         self.feature_data_tx_scroll.setFixedHeight(HEIGHT / 2)
         self.feature_data_tx_scroll.setWidget(self.feature_data_tx)
+
+        # set default values
+        self.query_res.setText(self.query_val)
+        self.limit_res.setText(str(self.limit_val))
+        # self.features_res.setText(self.features_val)
+        self.engine_res.setText(self.engine_val)
+
+        self.choices_res.setText(self.choices_str_val)
+        self.filepath_res.setText(self.dl_filepath_val)
+        self.audio_format_res.setText(self.audio_format_val)
 
         self.widgets = [self.query_tx, self.query_res,
                         self.limit_tx, self.limit_res,
